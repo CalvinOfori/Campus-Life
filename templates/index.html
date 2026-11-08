@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Campus essentials · {{ shop_name }}{% endblock %}
+{% block content %}
+<section class="hero-banner">
+  <div class="hero-content"><span class="eyebrow light-eyebrow">CAMPUS ESSENTIALS, SORTED</span><h1>Everything for campus life.<br><em>Pay in SOL.</em></h1><p>Good finds for lectures, late study sessions, and everything in between.</p><a class="button button-light" href="#all-products">Shop now <span>→</span></a></div>
+  <div class="hero-product"><span class="hero-product-label">STUDENT FAVORITE</span><img src="{{ url_for('static', filename='products/' + featured.image) }}" alt="{{ featured.name }}"><span class="hero-product-caption">{{ featured.name }} <b>{{ featured.price }} SOL</b></span></div>
+  <div class="hero-orbit hero-orbit-one"></div><div class="hero-orbit hero-orbit-two"></div>
+</section>
+
+<section class="value-row" aria-label="Store benefits">
+  <div class="value-item"><span class="value-icon">ϟ</span><div><strong>Pay in about 1 second</strong><small>Fast devnet confirmation</small></div></div>
+  <div class="value-item"><span class="value-icon">⌁</span><div><strong>Tiny network fees</strong><small>Keep more of your SOL</small></div></div>
+  <div class="value-item"><span class="value-icon">✓</span><div><strong>Secure on-chain receipts</strong><small>Every payment is verifiable</small></div></div>
+  <div class="value-item"><span class="value-icon">◎</span><div><strong>Wallet-to-wallet</strong><small>Pay directly from your wallet</small></div></div>
+</section>
+
+<section class="store-section">
+  <div class="section-heading"><div><span class="eyebrow">PICKS FOR YOUR NEXT CLASS</span><h2>Featured products</h2></div><a href="#all-products" class="text-link">Shop all products <span>→</span></a></div>
+  <div class="product-grid product-grid-4">{% for product in popular %}{% include "_product_card.html" %}{% endfor %}</div>
+</section>
+
+<section class="deal-band">
+  <div class="section-heading"><div><span class="eyebrow">SMALL SPEND, GOOD FINDS</span><h2>Under 0.005 SOL</h2></div><span class="deal-note">Wallet-friendly campus picks</span></div>
+  <div class="product-grid product-grid-4">{% for product in cheap[:4] %}{% include "_product_card.html" %}{% endfor %}</div>
+</section>
+
+<section class="store-section listing-section" id="all-products">
+  <div class="section-heading listing-heading"><div><span class="eyebrow">THE CAMPUS CORNER COLLECTION</span><h2>All products</h2><p class="listing-count">{{ listing|length }} items to explore</p></div></div>
+  <div class="catalog-layout">
+    <aside class="filter-sidebar">
+      <form action="{{ url_for('index') }}#all-products" method="get" id="filter-form">
+        <input type="hidden" name="q" value="{{ query }}">
+        <input type="hidden" name="sort" value="{{ selected_sort }}">
+        <div class="filter-head"><h3>Filter products</h3><a href="{{ url_for('index') }}#all-products">Clear</a></div>
+        <fieldset><legend>Category</legend>
+          {% for category in categories if category != 'All' %}<label class="check-row"><input type="checkbox" name="category" value="{{ category }}" {% if category in selected_categories %}checked{% endif %}><span class="fake-check"></span><span>{{ category }}</span><small>{{ products|selectattr('category', 'equalto', category)|list|length }}</small></label>{% endfor %}
+        </fieldset>
+        <fieldset><legend>Maximum price</legend><label class="price-label" for="max-price">Up to <span>SOL</span></label><input id="max-price" class="price-filter" type="number" min="0" step="0.0001" name="max_price" value="{{ max_price }}" placeholder="No limit"><button class="button button-teal filter-submit" type="submit">Apply filters</button></fieldset>
+      </form>
+    </aside>
+    <div class="catalog-content">
+      <div class="catalog-toolbar"><span>Showing <strong>{{ listing|length }}</strong> products{% if query %} for “{{ query }}”{% endif %}</span><label>Sort by <select name="sort" form="sort-form"><option value="featured" {% if selected_sort == 'featured' %}selected{% endif %}>Featured</option><option value="price-low" {% if selected_sort == 'price-low' %}selected{% endif %}>Price: low to high</option><option value="price-high" {% if selected_sort == 'price-high' %}selected{% endif %}>Price: high to low</option><option value="name" {% if selected_sort == 'name' %}selected{% endif %}>Name</option></select></label>
+        <form id="sort-form" action="{{ url_for('index') }}#all-products" method="get">{% for category in selected_categories %}<input type="hidden" name="category" value="{{ category }}">{% endfor %}<input type="hidden" name="q" value="{{ query }}"><input type="hidden" name="max_price" value="{{ max_price }}"></form>
+      </div>
+      {% if listing %}<div class="product-grid product-grid-4 listing-grid">{% for product in listing %}{% include "_product_card.html" %}{% endfor %}</div>
+      {% else %}<div class="no-results"><span>⌕</span><h3>No products found</h3><p>Try adjusting your search or filters.</p><a class="button button-outline" href="{{ url_for('index') }}#all-products">Clear filters</a></div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

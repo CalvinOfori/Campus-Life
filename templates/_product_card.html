@@ -1,0 +1,10 @@
+<article class="product-card">
+  <a class="product-card-image" href="{{ url_for('product_detail', product_id=product.id) }}"><span class="product-category-tag">{{ product.category }}</span><img src="{{ url_for('static', filename='products/' + product.image) }}" alt="{{ product.name }}" loading="lazy"></a>
+  <div class="product-card-body">
+    <a class="product-card-name" href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a>
+    <p>{{ product.description|truncate(75, true, '…') }}</p>
+    <div class="product-card-footer"><strong>{{ product.price }} <small>SOL</small></strong>
+      <form class="add-to-cart-form" action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post"><input type="hidden" name="quantity" value="1"><button class="button button-small button-outline" type="submit">Add to cart</button></form>
+    </div>
+  </div>
+</article>

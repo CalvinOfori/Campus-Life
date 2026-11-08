@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Shopping cart · {{ shop_name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{{ url_for('index') }}">Home</a><span>/</span><span>Shopping cart</span></nav>
+<div class="page-title-row"><div><span class="eyebrow">YOUR CAMPUS PICKS</span><h1>Shopping cart <small>({{ cart_count }} items)</small></h1></div><a class="text-link" href="{{ url_for('index') }}">Continue shopping <span>→</span></a></div>
+{% if lines %}
+<div class="cart-layout">
+  <section class="cart-table-card">
+    <div class="cart-table-head"><span>Product</span><span>Unit price</span><span>Quantity</span><span>Line total</span><span></span></div>
+    {% for line in lines %}<article class="cart-table-row">
+      <div class="cart-product-cell"><a class="cart-thumb" href="{{ url_for('product_detail', product_id=line.id) }}"><img src="{{ url_for('static', filename='products/' + line.image) }}" alt="{{ line.name }}"></a><div><a href="{{ url_for('product_detail', product_id=line.id) }}"><strong>{{ line.name }}</strong></a><small>{{ line.category }}</small></div></div>
+      <div class="cart-unit-price">{{ line.price }} <small>SOL</small></div>
+      <form class="cart-stepper" action="{{ url_for('update_cart') }}" method="post"><input type="hidden" name="product_id" value="{{ line.id }}"><button name="quantity" value="{{ line.quantity - 1 }}" aria-label="Decrease {{ line.name }} quantity">−</button><span>{{ line.quantity }}</span><button name="quantity" value="{{ line.quantity + 1 }}" aria-label="Increase {{ line.name }} quantity">+</button></form>
+      <div class="cart-line-total">{{ line.subtotal_lamports|sol }} <small>SOL</small></div>
+      <form action="{{ url_for('remove_from_cart', product_id=line.id) }}" method="post"><button class="remove-button" aria-label="Remove {{ line.name }}">×</button></form>
+    </article>{% endfor %}
+    <div class="cart-table-bottom"><a href="{{ url_for('index') }}">← Continue shopping</a><span>Prices shown in SOL</span></div>
+  </section>
+  <aside class="order-summary-card"><h2>Order summary</h2><div class="summary-row"><span>Subtotal</span><strong>{{ total_lamports|sol }} SOL</strong></div><div class="summary-row"><span>Shipping</span><strong>Campus pickup</strong></div><div class="summary-row network-fee"><span>Network fee</span><span>Paid by your wallet</span></div><div class="summary-grand-total"><span>Total</span><strong>{{ total_lamports|sol }} <small>SOL</small></strong></div><form action="{{ url_for('checkout') }}" method="post"><button class="button button-teal checkout-button" type="submit">Checkout with Solana Pay <span>→</span></button></form><p class="secure-note"><span>✓</span> Secure checkout on Solana devnet</p></aside>
+</div>
+{% else %}<div class="empty-cart"><div class="empty-cart-icon">▱</div><h2>Your cart is empty</h2><p>Looks like you haven't found your campus essential yet.</p><a class="button button-teal" href="{{ url_for('index') }}">Browse the shop</a></div>{% endif %}
+{% endblock %}

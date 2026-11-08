@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>{% block title %}{{ shop_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <div class="utility-bar"><div class="site-container utility-inner"><span>Demo store - Solana devnet - no real goods ship</span><a href="{{ url_for('index') }}">Pay with SOL</a></div></div>
+  <header class="site-header">
+    <div class="site-container header-main">
+      <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">C</span><span>Campus Corner Store</span></a>
+      <form class="site-search" action="{{ url_for('index') }}" method="get" role="search">
+        <label class="sr-only" for="header-category">Search category</label>
+        <select name="category" id="header-category"><option value="All">All categories</option>{% for category in categories %}{% if category != 'All' %}<option value="{{ category }}" {% if request.args.get('category') == category %}selected{% endif %}>{{ category }}</option>{% endif %}{% endfor %}</select>
+        <span class="search-divider"></span><label class="sr-only" for="header-search">Search products</label>
+        <input id="header-search" type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search products, categories and more">
+        <button aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4.4 4.4"/></svg></button>
+      </form>
+      <div class="header-actions"><a class="orders-link" href="{{ url_for('orders_page') }}">Orders</a><a class="header-cart" href="{{ url_for('cart_page') }}" aria-label="Cart, {{ cart_count }} items">
+        <svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 1.9-1.5L21 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg><span class="cart-head-copy"><strong>Cart</strong><small>{{ cart_count }} items · {{ cart_total_lamports|sol }} SOL</small></span>{% if cart_count %}<i class="cart-count">{{ cart_count }}</i>{% endif %}
+      </a></div>
+    </div>
+    <nav class="category-nav"><div class="site-container category-nav-inner"><a class="{% if request.args.get('category', 'All') == 'All' %}current{% endif %}" href="{{ url_for('index', category='All') }}">All</a>{% for category in categories %}{% if category != 'All' %}<a class="{% if request.args.get('category') == category %}current{% endif %}" href="{{ url_for('index', category=category) }}">{{ category }}</a>{% endif %}{% endfor %}<a class="category-nav-more" href="{{ url_for('dashboard') }}">Merchant dashboard <span>→</span></a></div></nav>
+  </header>
+  <main class="site-container page-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="flash {{ category }}" role="status">{{ message }}</div>{% endfor %}{% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer" id="image-credits">
+    <div class="site-container footer-grid">
+      <div class="footer-about"><a class="brand footer-brand" href="{{ url_for('index') }}"><span class="brand-mark">C</span><span>Campus Corner Store</span></a><p>Useful finds for campus life. Checkout is powered by Solana devnet.</p><a href="#image-credits">Image credits</a><small>Product illustrations are original demo assets.</small></div>
+      <div><h3>Shop</h3>{% for category in categories %}{% if category != 'All' %}<a href="{{ url_for('index', category=category) }}">{{ category }}</a>{% endif %}{% endfor %}</div>
+      <div><h3>Help</h3><a href="{{ url_for('orders_page') }}">Order history</a><a href="{{ url_for('dashboard') }}">Merchant dashboard</a><a href="{{ url_for('index') }}">Payment help</a></div>
+      <div class="footer-devnet"><span class="devnet-icon">S</span><div><strong>Built on Solana devnet</strong><small>Demo payments only · No real goods ship</small></div></div>
+    </div>
+    <div class="site-container footer-bottom"><span>© {{ shop_name }} · Demo experience</span><span>Transactions use devnet SOL</span></div>
+  </footer>
+  <div class="toast" id="cart-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

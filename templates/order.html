@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Checkout · {{ shop_name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{{ url_for('index') }}">Home</a><span>/</span><a href="{{ url_for('cart_page') }}">Cart</a><span>/</span><span>Checkout</span></nav>
+<div class="checkout-page" data-order-id="{{ order.id }}" data-status-url="{{ status_url }}" data-initial-status="{{ order.status }}">
+  <div class="page-title-row checkout-title-row"><div><span class="eyebrow">ORDER #{{ order.id }} · DEVNET CHECKOUT</span><h1>Complete your payment</h1></div><span class="status-pill {{ order.status }}" id="payment-status">{% if order.status == 'paid' %}Paid{% else %}<i></i> Waiting for payment{% endif %}</span></div>
+  <div class="checkout-layout">
+    <section class="checkout-summary-panel"><div class="checkout-panel-heading"><div><h2>Order summary</h2><p>{{ order['items']|length }} {% if order['items']|length == 1 %}item{% else %}items{% endif %}</p></div><span class="order-number">#{{ order.id }}</span></div>
+      <div class="checkout-items">{% if order['items'] %}{% for item in order['items'] %}<div class="checkout-item"><img src="{{ url_for('static', filename='products/' + item.image) }}" alt="{{ item.name }}"><div><strong>{{ item.name }}</strong><small>{{ item.category }} · Qty {{ item.quantity }}</small></div><span>{{ item.subtotal_lamports|sol }} SOL</span></div>{% endfor %}{% else %}<div class="checkout-item"><div><strong>{{ order.item_name }}</strong></div><span>{{ order.amount_lamports|sol }} SOL</span></div>{% endif %}</div>
+      <div class="checkout-sum-row"><span>Subtotal</span><strong>{{ order.amount_lamports|sol }} SOL</strong></div><div class="checkout-sum-row"><span>Network fee</span><span>Paid by your wallet</span></div><div class="checkout-total"><span>Total due</span><strong>{{ order.amount_lamports|sol }} <small>SOL</small></strong></div>
+    </section>
+    <section class="payment-column">
+      <div id="pending-state" class="payment-card" {% if order.status == 'paid' %}hidden{% endif %}>
+        {% if qr_data_uri %}<div class="payment-card-heading"><span class="solana-icon">S</span><div><h2>Pay with Solana Pay</h2><p>Scan the code with your devnet wallet</p></div></div><div class="qr-code-frame"><img src="{{ qr_data_uri }}" alt="Solana Pay payment QR code"></div><div class="payment-amount"><span>Amount to pay</span><strong>{{ order.amount_lamports|sol }} <small>SOL</small></strong></div><a class="solana-uri-link" href="{{ pay_url }}"><span>{{ pay_url }}</span><b>Open wallet ↗</b></a><div class="waiting-state"><span class="spinner"></span><div><strong>Waiting for payment</strong><small>Keep this page open while your payment confirms.</small></div></div>
+        {% else %}<div class="config-note">Set a valid merchant wallet address in <code>.env</code> to enable payment QR codes.</div>{% endif %}
+      </div>
+      <div id="success-state" class="success-card" {% if order.status != 'paid' %}hidden{% endif %}><div class="success-animation"><svg viewBox="0 0 48 48"><path d="m12 24 8 8 16-17"/></svg></div><span class="eyebrow success-eyebrow">PAYMENT CONFIRMED</span><h2>Thank you for your order!</h2><p>Your devnet payment is verified and your receipt is ready.</p><div class="receipt-breakdown">{% if order['items'] %}{% for item in order['items'] %}<div><span>{{ item.name }} ×{{ item.quantity }}</span><strong>{{ item.subtotal_lamports|sol }} SOL</strong></div>{% endfor %}{% else %}<div><span>{{ order.item_name }}</span><strong>{{ order.amount_lamports|sol }} SOL</strong></div>{% endif %}</div><div class="receipt-total"><span>Total paid</span><strong>{{ order.amount_lamports|sol }} SOL</strong></div><div class="receipt-signature"><span>TRANSACTION SIGNATURE</span><code id="receipt-signature">{{ order.signature or '' }}</code></div><a id="explorer-link" class="explorer-link" href="{% if order.signature %}https://explorer.solana.com/tx/{{ order.signature }}?cluster=devnet{% else %}#{% endif %}" target="_blank" rel="noopener">View on Solana Explorer ↗</a><a class="button button-teal continue-shopping" href="{{ url_for('index') }}">Continue shopping</a></div>
+    </section>
+  </div>
+</div>
+{% endblock %}

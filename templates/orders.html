@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Order history · {{ shop_name }}{% endblock %}
+{% block content %}
+<nav class="breadcrumbs"><a href="{{ url_for('index') }}">Home</a><span>/</span><span>Order history</span></nav>
+<div class="page-title-row"><div><span class="eyebrow">YOUR PURCHASES</span><h1>Order history</h1></div><a class="button button-outline" href="{{ url_for('index') }}">Continue shopping</a></div>
+{% if orders %}<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>{% for order in orders %}<tr><td><a class="table-order-link" href="{{ url_for('order_page', order_id=order.id) }}">#{{ order.id }}</a></td><td>{{ order.created_at }}</td><td>{{ order.item_name }}</td><td>{{ order.amount_lamports|sol }} SOL</td><td><span class="status-pill small-status {{ order.status }}">{{ order.status }}</span></td><td><a class="text-link" href="{{ url_for('order_page', order_id=order.id) }}">View →</a></td></tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="empty-cart"><span class="empty-icon">▤</span><h2>No orders yet</h2><p>Your checkouts and receipts will appear here.</p><a class="button button-teal" href="{{ url_for('index') }}">Browse the shop</a></div>{% endif %}
+{% endblock %}
